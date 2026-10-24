@@ -18,5 +18,12 @@ def health():
 def products():
     return jsonify(PRODUCTS)
 
+@app.route("/api/products/<int:product_id>")
+def product(product_id):
+    for p in PRODUCTS:
+        if p["id"] == product_id:
+            return jsonify(p)
+    return jsonify({"status": "not found"}), 404
+
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
