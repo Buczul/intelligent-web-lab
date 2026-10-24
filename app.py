@@ -1,5 +1,6 @@
 import math
 from flask import Flask, jsonify, request
+from werkzeug.exceptions import UnsupportedMediaType, BadRequest
 
 app = Flask(__name__)
 
@@ -20,7 +21,7 @@ def products():
     max_price = request.args.get("max_price", type=float)
 
     if "max_price" in request.args:
-        if (max_price is None or max_price < 0 or math.isnan(max_price) or math.isinf(max_price)): return jsonify({"error": "Invalid max_price"}), 400
+        if (max_price is None or max_price < 0 or math.isnan(max_price) or math.isinf(max_price)): return jsonify({"error": "invalid max_price"}), 400
         else:
             filtered_products = []
             for p in PRODUCTS:
@@ -35,13 +36,31 @@ def product(product_id):
     for p in PRODUCTS:
         if p["id"] == product_id:
             return jsonify(p)
-    return jsonify({"status": "not found"}), 404
+    return jsonify({"error": "not found"}), 404
 
 @app.route("/api/products", methods=["POST"])
 def create_product():
-    product_data = request.get_json()
+    if not request.is_json: return jsonify({"error": "invalid JSON"}), 400
 
-    max_id = 1
+    try:
+        product_data = request.get_json()
+    except BadRequest:
+        return jsonify({"error": "invalid JSON"}), 400
+
+    if not(isinstance(product_data, dict)): return jsonify({"error": "expected JSON object"}), 400
+
+    if "id" in product_data: return jsonify({"error": "ID is assigned by server"}), 400
+
+    required_keys = ["nazwa", "kategoria", "cena", "opis"]
+    if not all(key in product_data for key in required_keys): return jsonify({"error": "expected nazwa, kategoria, cena, opis in JSON"}), 400
+
+    string_keys = ("nazwa", "kategoria", "opis")
+    if any(not isinstance(product_data[key], str) or not product_data[key].strip() for key in string_keys): return jsonify({"error": "fields must be non-empty strings"}), 400
+
+    price = product_data["cena"]
+    if type(price) not in (int, float) or (type(price) is float and not math.isfinite(price)) or price < 0: return jsonify({"error": "invalid value of cena"}), 400
+
+    max_id = 0
     for p in PRODUCTS:
         if p["id"] > max_id: max_id = p["id"]
 
