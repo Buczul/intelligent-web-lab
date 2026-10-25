@@ -1,5 +1,5 @@
 import math
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from werkzeug.exceptions import BadRequest
 from recommender import recommend
 
@@ -12,6 +12,10 @@ PRODUCTS = [
     {"id": 4, "nazwa": "Słuchawki nauszne", "kategoria": "audio", "cena": 449.00, "opis": "ANC, 40 h pracy na baterii"},
     {"id": 5, "nazwa": "Hub USB-C", "kategoria": "akcesoria", "cena": 199.00, "opis": "HDMI, 3x USB-A, czytnik SD"},
 ]
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 @app.route("/api/health")
 def health():

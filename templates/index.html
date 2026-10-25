@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekomendacja filmów</title>
+</head>
+<body>
+    <h2>Rekomendacja filmów</h2>
+    <form id="recs_form">
+        <label for="form_title">Tytuł</label>
+        <input type="text" name="title" id="form_title">
+
+        <label for="form_recs_number">Liczba Rekomendacji</label>
+        <input type="number" name="recs_number" id="form_recs_number" min="1" max="10" value="5">
+
+        <label for="form_genre">Gatunek</label>
+        <input type="text" name="genre" id="form_genre">
+
+        <button type="submit">Szukaj</button>
+
+        <br>
+
+        <ul id="recs_results"></ul>
+    </form>
+
+    <script>
+        const form = document.getElementById('recs_form')
+
+        form.addEventListener('submit',async (event) => {
+            event.preventDefault();
+
+            const title = document.getElementById('form_title').value;
+            const top_n = document.getElementById('form_recs_number').value;
+            const genre = document.getElementById('form_genre').value;
+
+            const params = new URLSearchParams({
+                title: title,
+                top_n: top_n,
+                genre: genre
+            });
+
+            const response = await fetch(`/api/recommend?${params}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error(data.error);
+                return;
+            }
+
+            console.log(data);
+
+            const resultsList = document.getElementById('recs_results');
+
+            resultsList.replaceChildren();
+
+            for (const movie of data.recommendations) {
+                const li = document.createElement('li');
+
+                li.textContent = `${movie.title} - ${movie.genre} - ocena: ${movie.rating} - podobieństwo: ${movie.score}`;
+
+                resultsList.appendChild(li);
+            }
+        });
+    </script>
+</body>
+</html>
