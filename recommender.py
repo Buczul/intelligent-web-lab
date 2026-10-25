@@ -3,6 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MultiLabelBinarizer
 from scipy.sparse import hstack
+from difflib import get_close_matches
 
 
 df = pd.read_csv("movies.csv")
@@ -21,6 +22,16 @@ hybrid = hstack([tfidf_matrix, G * 0.5])
 print(tfidf_matrix.shape)
 
 sim_matrix = cosine_similarity(hybrid)
+
+def get_close_titles(title):
+        titles = df["title"].tolist()
+
+        suggestions = get_close_matches(title, titles, n=3, cutoff=0.5)
+
+        if suggestions:
+            return suggestions
+
+        return None
 
 def recommend(title, top_n=5, genre=None):
     match = df[df["title"].str.lower() == title.lower()]

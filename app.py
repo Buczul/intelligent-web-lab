@@ -1,7 +1,7 @@
 import math
 from flask import Flask, jsonify, request, render_template
 from werkzeug.exceptions import BadRequest
-from recommender import recommend
+from recommender import recommend, get_close_titles
 
 app = Flask(__name__)
 
@@ -87,7 +87,12 @@ def api_recommend():
     genre = request.args.get("genre", type=str).strip() if "genre" in request.args else None
 
     recs = recommend(title, n, genre)
-    if recs is None: return jsonify({"error": "nie znam takiego filmu"}), 404
+    if recs is None:
+        close_titles = get_close_titles(title)
+        if close_titles: return jsonify({"error": "Nie znam takiego filmu", "suggestions": close_titles}), 404
+
+        return jsonify({"error": "nie znam takiego filmu"}), 404
+
 
     return jsonify({"title": title, "count": len(recs), "recommendations": recs})
 
