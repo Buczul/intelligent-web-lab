@@ -1,8 +1,9 @@
-from idlelib.macosx import isXQuartz
-
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import MultiLabelBinarizer
+from scipy.sparse import hstack
+
 
 df = pd.read_csv("movies.csv")
 df["overview"] = df["overview"].fillna("")
@@ -14,13 +15,14 @@ print(df.isnull().sum())
 vectorizer = TfidfVectorizer(stop_words="english")
 tfidf_matrix = vectorizer.fit_transform(df["overview"])
 
+G = MultiLabelBinarizer().fit_transform(df["genres"].str.split("|"))
+hybrid = hstack([tfidf_matrix, G * 0.5])
+
 print(tfidf_matrix.shape)
 
-sim_matrix = cosine_similarity(tfidf_matrix)
+sim_matrix = cosine_similarity(hybrid)
 
 def recommend(title, top_n=5, genre=None):
-    # df_splited_genres = df["genres"].str.split("|", regex=False)
-
     match = df[df["title"].str.lower() == title.lower()]
 
     if match.empty:
