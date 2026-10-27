@@ -10,7 +10,10 @@ def api_recommend():
     if not user:
         return jsonify({"error": "podaj parametr ?user=..."}), 400
 
-    recs = recommend(user)
+    k = request.args.get("k", type=int) if "k" in request.args else 3
+    if k is None or not 1 <= k <= 11: return jsonify({"error": "k musi byc z zakresu 1-11"}), 400
+
+    recs = recommend(user, k=k)
     if recs is None:
         return jsonify({"error": "nie znam takiego uzytkownika", "known_users": sorted(matrix.index.tolist())}), 404
 
