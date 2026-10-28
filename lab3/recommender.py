@@ -12,9 +12,28 @@ centered = matrix.sub(means, axis=0).fillna(0)
 
 sim = pd.DataFrame(cosine_similarity(centered), index=matrix.index, columns=matrix.index)
 
+items = centered.T
+
+sim_items = pd.DataFrame(cosine_similarity(items), index=items.index, columns=items.index)
+
+def fallback(user, top_n=5):
+    movie_means = df.groupby("title")["rating"].mean()
+
+    rated = matrix.loc[user].notna()
+
+    sorted_movie_means = movie_means.sort_values(ascending=False)[~rated][:top_n]
+
+    return [
+        {"title": t, "rate": round(float(r), 2)}
+        for t, r in sorted_movie_means.items()
+    ]
+
 def recommend(user, top_n=5, k=3):
     if user not in matrix.index:
         return None
+
+    rated_movies = matrix.loc[user].notna().sum()
+    if rated_movies <= 1: return fallback(user)
 
     neighbors = sim[user].drop(user).sort_values(ascending=False).head(k)
 
