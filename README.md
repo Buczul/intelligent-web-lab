@@ -1,7 +1,3 @@
-# Intelligent Web Lab
-
-Repozytorium zawiera rozwiązania laboratoriów z przedmiotu dotyczącego inteligentnych systemów informatycznych. Projekt obejmuje tworzenie API w Pythonie oraz implementację systemów rekomendacji filmów.
-
 ## Technologie
 
 - Python 3
@@ -34,26 +30,86 @@ Przejdź do katalogu laboratorium 1, w którym znajduje się plik `app.py` i uru
 python app.py
 ```
 
-Adres i port zależą od konfiguracji aplikacji.
+Adres i port zależą od konfiguracji aplikacji. Domyślnie ustalono adres 127.0.0.1 oraz port 5001
 
-#### Przykładowe zapytanie
+#### Zapytania
+
+```http
+GET /api/health
+```
+Przykład: 
+
+`http://127.0.0.1:5001/api/health`
+
+Odpowiedź:
+
+```json
+{
+  "status": "ok"
+}
+```
 
 ```http
 GET /api/products
 ```
+Przykład: 
 
-Przykładowa odpowiedź:
+`http://127.0.0.1:5001/api/products`
+
+Odpowiedź:
 
 ```json
 [
   {
-    "id": 1,
-    "nazwa": "Klawiatura mechaniczna",
-    "kategoria": "akcesoria",
     "cena": 349.99,
-    "opis": "Klawiatura mechaniczna"
+    "id": 1,
+    "kategoria": "akcesoria",
+    "nazwa": "Klawiatura mechaniczna",
+    "opis": "Prze\u0142\u0105czniki hot-swap, pod\u015bwietlenie RGB"
+  },
+  {
+    "cena": 129.0,
+    "id": 2,
+    "kategoria": "akcesoria",
+    "nazwa": "Mysz bezprzewodowa",
+    "opis": "Ciche przyciski, 4000 DPI"
   }
 ]
+```
+
+Przykład: 
+
+`http://127.0.0.1:5001/api/products/1`
+
+Odpowiedź:
+
+```json
+{
+  "cena": 349.99,
+  "id": 1,
+  "kategoria": "akcesoria",
+  "nazwa": "Klawiatura mechaniczna",
+  "opis": "Prze\u0142\u0105czniki hot-swap, pod\u015bwietlenie RGB"
+}
+```
+
+```http
+POST /api/products
+```
+Przykład: 
+
+`curl -X POST http://127.0.0.1:5001/api/products -H "Content-Type: application/json" -d "{\"nazwa\":\"Hub USB-C\",\"kategoria\":\"akcesoria\",\"cena\":79.99,\"opis\":\"Hub USB z czterema portami\"}"  `
+
+Odpowiedź:
+
+```json
+{
+  "cena": 79.99,
+  "id": 6,
+  "kategoria": "akcesoria",
+  "nazwa": "Hub USB-C",
+  "opis": "Hub USB z czterema portami"
+}
 ```
 
 ## MODUŁ 1
@@ -72,26 +128,47 @@ Przejdź do katalogu laboratorium 2, w którym znajduje się plik `app.py` i wym
 python app.py
 ```
 
-#### Przykładowe zapytanie
+#### INDEX.html
+
+Po uruchomieniu `app.py` pod adresem `http://127.0.0.1:5001/` będzie dostępna prosta strona html z formularzem rekomendacji.
+
+#### Zapytania
 
 ```http
-GET /api/recommend?title=Inception&top_n=5
+GET /api/recommend
 ```
+Przykład: 
 
-Przykładowa odpowiedź:
+`http://127.0.0.1:5001/api/recommend?title=Her&top_n=3&genre=drama`
+
+Parametry `top_n` oraz `genre` są opcjonalne.
+
+Odpowiedź:
 
 ```json
 {
-  "title": "Inception",
-  "count": 1,
+  "count": 3,
   "recommendations": [
     {
-      "title": "Przykładowy film",
-      "genres": "thriller|drama",
-      "rating": 8.1,
-      "score": 0.42
+      "genre": "romance|drama",
+      "rating": 7.9,
+      "score": 0.237,
+      "title": "Titanic"
+    },
+    {
+      "genre": "sci-fi|drama",
+      "rating": 8.6,
+      "score": 0.167,
+      "title": "Interstellar"
+    },
+    {
+      "genre": "romance|drama",
+      "rating": 7.8,
+      "score": 0.167,
+      "title": "The Notebook"
     }
-  ]
+  ],
+  "title": "Her"
 }
 ```
 
@@ -109,29 +186,106 @@ Przejdź do katalogu laboratorium 3, w którym znajduje się plik `app.py` i wym
 python app.py
 ```
 
-#### Przykładowe zapytanie
+#### Zapytania
 
 ```http
-GET /api/recommend?user=Ania&k=3
+GET /api/recommend
 ```
 
-Przykładowa odpowiedź:
+Przykład: 
+
+`http://127.0.0.1:5001/api/recommend?user=Ania&k=3`
+
+Parametr `k` jest opcjonalny.
+
+Odpowiedź:
 
 ```json
 {
-  "user": "Ania",
-  "count": 1,
+  "count": 5,
   "recommendations": [
     {
-      "title": "Przykładowy film",
-      "predicted": 4.18,
-      "because": ["Celina", "Jacek"]
+      "because": [
+        "Celina",
+        "Jacek",
+        "Kasia"
+      ],
+      "predicted": 4.31,
+      "title": "Fight Club"
+    },
+    {
+      "because": [
+        "Celina"
+      ],
+      "predicted": 3.08,
+      "title": "Forrest Gump"
+    },
+    {
+      "because": [
+        "Celina",
+        "Jacek",
+        "Kasia"
+      ],
+      "predicted": 2.37,
+      "title": "Toy Story"
+    },
+    {
+      "because": [
+        "Kasia"
+      ],
+      "predicted": 2.24,
+      "title": "The Shawshank Redemption"
+    },
+    {
+      "because": [
+        "Celina",
+        "Jacek",
+        "Kasia"
+      ],
+      "predicted": 2.13,
+      "title": "Spirited Away"
     }
-  ]
+  ],
+  "user": "Ania"
 }
 ```
 
-Przykładowe odpowiedzi API mają charakter poglądowy. Rzeczywiste wyniki zależą od danych wejściowych i implementacji danego laboratorium.
+Przykład: 
+
+`http://127.0.0.1:5001/api/recommend?user=Bogdan`
+
+`Bogdan` to użytkownik celowo dodany do bazy z tylko jednym ocenionym filmem.
+
+Odpowiedź:
+
+```json
+{
+  "count": 5,
+  "recommendations": [
+    {
+      "rate": 4.25,
+      "title": "Fight Club"
+    },
+    {
+      "rate": 4.0,
+      "title": "The Shawshank Redemption"
+    },
+    {
+      "rate": 3.91,
+      "title": "Her"
+    },
+    {
+      "rate": 3.88,
+      "title": "A Quiet Place"
+    },
+    {
+      "rate": 3.86,
+      "title": "Forrest Gump"
+    }
+  ],
+  "user": "Bogdan"
+}
+```
 
 ## Dane wejściowe
 
