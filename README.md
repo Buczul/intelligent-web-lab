@@ -1,3 +1,7 @@
+# Intelligent Web Lab
+
+Repozytorium zawiera rozwiązania laboratoriów z przedmiotu dotyczącego inteligentnych systemów informatycznych.
+
 ## Technologie
 
 - Python 3
@@ -292,7 +296,3 @@ Odpowiedź:
 - Lab 1 – przykładowe dane produktów zdefiniowane w aplikacji.
 - Lab 2 – plik `movies.csv` zawierający informacje o filmach, w tym tytuły, opisy, gatunki i oceny.
 - Lab 3 – plik `ratings.csv` zawierający oceny filmów wystawione przez użytkowników.
-
-## Cel projektu
-
-Celem projektu jest poznanie podstaw tworzenia API w Flask, walidacji danych, przetwarzania danych tabelarycznych oraz implementacji metod podobieństwa i rekomendacji.
